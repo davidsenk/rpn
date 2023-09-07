@@ -1,5 +1,6 @@
 use std::io;
 use std::io::Write;
+use std::num::ParseFloatError;
 use std::str::FromStr;
 
 fn main() {
@@ -27,12 +28,14 @@ fn main() {
             "*" | "x" => Function::Multiply,
             "/" => Function::Divide,
             "%" => Function::Modulo,
-            _ => Function::Push(f64::from_str(input.trim()).expect("valid number")),
+            "clear" | "c" => Function::ClearStack,
+            _ => Function::Push(f64::from_str(input.trim())),
         };
 
         match func {
-            Function::Push(x) => stack.push(x),
+            Function::Push(x) => stack_push(&mut stack, x),
             Function::Quit => break,
+            Function::ClearStack => stack.clear(),
             others => operate(&mut stack, others),
         }
 
@@ -50,8 +53,16 @@ enum Function {
     Multiply,
     Divide,
     Modulo,
-    Push(f64),
+    Push(Result<f64, ParseFloatError>),
+    ClearStack,
     Quit,
+}
+
+fn stack_push(stack: &mut Vec<f64>, num: Result<f64, ParseFloatError>) {
+    match num {
+        Ok(num) => stack.push(num),
+        Err(e) => println!("Cannot push:  {e}."),
+    }
 }
 
 fn stack_too_small_err(func: &str) {
