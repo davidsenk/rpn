@@ -32,6 +32,27 @@ fn main() {
             "floor" | "fl" => Function::Floor,
             "ceil" | "cl" => Function::Ceil,
             "round" | "r" => Function::Round,
+            "abs" => Function::Abs,
+            "pow" | "^" => Function::Pow,
+            "sqrt" | "v" => Function::Sqrt,
+            "cbrt" | "v3" => Function::Cbrt,
+            "ln" => Function::LogN,
+            "log" => Function::Log,
+            "sin" => Function::Sin,
+            "asin" => Function::Asin,
+            "sinh" => Function::Sinh,
+            "acos" => Function::Acos,
+            "cos" => Function::Cos,
+            "cosh" => Function::Cosh,
+            "tan" => Function::Tan,
+            "atan" => Function::Atan,
+            "tanh" => Function::Tanh,
+            "me" => Function::Epsilon,
+            "euler" | "e" => Function::Euler,
+            "pi" => Function::Pi,
+            "tau" => Function::Tau,
+            "del" | "d" => Function::DeleteLast,
+            "help" | "?" => Function::Help,
             _ => Function::Push(f64::from_str(input.trim())),
         };
 
@@ -80,7 +101,9 @@ enum Function {
     Pi,
     Tau,
     Push(Result<f64, ParseFloatError>),
+    DeleteLast,
     ClearStack,
+    Help,
     Quit,
 }
 
@@ -91,67 +114,124 @@ fn stack_push(stack: &mut Vec<f64>, num: Result<f64, ParseFloatError>) {
     }
 }
 
-fn idk_man(func: Function) {
-    println!("I don't know how to do {func:?}!")
-}
-
-fn small_stack_err(count_expected: i32, func: &str) {
+fn small_stack_err(count_expected: usize, func: &str) {
     println!("Stack must contain at least {count_expected} numbers to {func}!");
 }
 
-fn stack_way_too_small_err(func: &str) {
-    small_stack_err(1, func)
-}
-
-fn stack_too_small_err(func: &str) {
-    small_stack_err(2, func);
-}
-
-fn operate_single(stack: &mut Vec<f64>, func: Function) {
-    if stack.len() < 1 {
-        stack_way_too_small_err("anything!!");
-        return;
-    }
-
-    let x = stack.pop().unwrap_or(0f64);
-
+fn operands_needed(func: &Function) -> usize {
     match func {
-        Function::Round => stack.push(x.round()),
-        others => idk_man(others),
+        Function::Add => 2,
+        Function::Subtract => 2,
+        Function::Multiply => 2,
+        Function::Divide => 2,
+        Function::Modulo => 2,
+        Function::Floor => 2,
+        Function::Ceil => 2,
+        Function::Round => 1,
+        Function::Abs => 1,
+        Function::Pow => 2,
+        Function::Sqrt => 1,
+        Function::Cbrt => 1,
+        Function::LogN => 1,
+        Function::Log => 1,
+        Function::Sin => 1,
+        Function::Asin => 1,
+        Function::Sinh => 1,
+        Function::Acos => 1,
+        Function::Cos => 1,
+        Function::Cosh => 1,
+        Function::Tan => 1,
+        Function::Atan => 1,
+        Function::Tanh => 1,
+        Function::Epsilon => 0,
+        Function::Euler => 0,
+        Function::Pi => 0,
+        Function::Tau => 0,
+        Function::Push(_) => 0,
+        Function::ClearStack => 0,
+        Function::DeleteLast => 1,
+        Function::Help => 0,
+        Function::Quit => 0,
     }
 }
 
 fn operate(stack: &mut Vec<f64>, func: Function) {
-    if stack.len() <= 1 {
-        match func {
-            Function::Add => stack_too_small_err("add"),
-            Function::Subtract => stack_too_small_err("subtract"),
-            Function::Multiply => stack_too_small_err("multiply"),
-            Function::Divide => stack_too_small_err("divide"),
-            Function::Modulo => stack_too_small_err("modulo"),
-            Function::Floor => stack_too_small_err("floor"),
-            Function::Ceil => stack_too_small_err("ceil"),
-            _ => {} //only above functions require
-        }
-        return;
+    if stack.len() < operands_needed(&func) {
+        small_stack_err(operands_needed(&func), format!("{func:?}").as_str());
     }
+    let x;
+    let y;
+    //let z;
 
-    let x = stack.pop().unwrap_or(0f64);
-    let y = stack.pop().unwrap_or(0f64);
+    match operands_needed(&func) {
+        0 => {
+            x = 0f64;
+            y = 0f64;
+            //z = 0f64;
+        }
+        1 => {
+            x = stack.pop().unwrap_or(0f64);
+            y = 0f64;
+            //z = 0f64;
+        }
+        2 => {
+            x = stack.pop().unwrap_or(0f64);
+            y = stack.pop().unwrap_or(0f64);
+            //z = 0f64;
+        }
+        3 => {
+            x = stack.pop().unwrap_or(0f64);
+            y = stack.pop().unwrap_or(0f64);
+            //z = stack.pop().unwrap_or(0f64);
+        }
+        _ => {
+            x = 0f64;
+            y = 0f64;
+            //z = 0f64;
+            println!("Function requires more operands than I know how to pull off of the stack :(");
+        }
+    }
 
     match func {
         Function::Add => stack.push(x + y),
         Function::Subtract => stack.push(x - y),
+        Function::Multiply => stack.push(x * y),
         Function::Divide => stack.push(y / x),
         //x is at top of stack, but divide is order
         //dependent. We're dividing the number input prior
         //to x (y), by x. i.e. x: 3, y: 6, push = 0.5
-        Function::Multiply => stack.push(x * y),
-        //same reason as division above
         Function::Modulo => stack.push(y % x),
+        //same reason as division above
         Function::Floor => stack.push(floor(x, y)),
         Function::Ceil => stack.push(ceil(x, y)),
-        others => idk_man(others),
+        Function::Round => stack.push(x.round()),
+        Function::Abs => stack.push(x.abs()),
+        Function::Pow => stack.push(y.powf(x)),
+        Function::Sqrt => stack.push(x.sqrt()),
+        Function::Cbrt => stack.push(x.cbrt()),
+        Function::LogN => stack.push(x.ln()),
+        Function::Log => stack.push(x.log10()),
+        Function::Sin => stack.push(x.sin()),
+        Function::Asin => stack.push(x.asin()),
+        Function::Sinh => stack.push(x.sinh()),
+        Function::Acos => stack.push(x.acos()),
+        Function::Cos => stack.push(x.cos()),
+        Function::Cosh => stack.push(x.cosh()),
+        Function::Tan => stack.push(x.tan()),
+        Function::Atan => stack.push(x.atan()),
+        Function::Tanh => stack.push(x.tanh()),
+        Function::Epsilon => stack.push(f64::EPSILON),
+        Function::Euler => stack.push(std::f64::consts::E),
+        Function::Pi => stack.push(std::f64::consts::PI),
+        Function::Tau => stack.push(std::f64::consts::TAU),
+        Function::Push(_) => println!("Push failed"),
+        //this shouldn't happen, as this should be pushed from main()
+        Function::Quit => println!("Quit failed"),
+        //this shouldn't happen, as this should be breaking in main()
+        Function::DeleteLast => {}
+        //the last value was popped, but we aren't doing anything with it
+        Function::ClearStack => stack.clear(),
+        Function::Help => print_help(),
     }
 }
 
@@ -169,4 +249,8 @@ fn ceil(a: f64, b: f64) -> f64 {
     } else {
         b
     }
+}
+
+fn print_help() {
+    println!("RPN Calculator Help")
 }
