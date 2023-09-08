@@ -252,5 +252,50 @@ fn ceil(a: f64, b: f64) -> f64 {
 }
 
 fn print_help() {
-    println!("RPN Calculator Help")
+    println!("RPN Calculator Help");
+    println!();
+    println!("This is an RPN (Reverse Polish Notation) calculator program. This works by pushing numbers to a stack, and then completing operations on the pushed numbers in the order that they were added to the stack.");
+    println!();
+    println!("Example: 4 [enter] 3 [enter] * [enter]");
+    println!("Will display 12 on the Current Stack (i.e. 4 * 3 = 12)");
+    println!();
+    println!("Many more math functions are available:");
+    println!();
+    println!("[Command]            [Function]");
+    println!("q                    quit calculator (ctrl-c also works)");
+    println!("+                    add the last two numbers on the stack");
+    println!("-                    subtract the last two numbers on the stack");
+    println!("* or x               multiply the last two numbers on the stack");
+    println!("/                    divide the last two numbers on the stack");
+    println!("%                    output the remainder of the division of the last two numbers on the stack (modulus)");
+    println!("clear or c           clear the stack of all values");
+    println!("del or d             remove the last number pushed to the stack (this can be repeated multiple times)");
+    println!("floor                take the last two numbers from the stack, and push the lower number back onto the stack");
+    println!("ceil                 take the last two numbers from the stack, and push the higher number back onto the stack");
+    println!("round                round the last number on the stack (follows conventional rules, 0.5 rounds up)");
+    println!("abs                  change the last number on the stack to it's absolute value");
+    println!("pow                  raise the number on the stack prior to the last input to the power of the last number input");
+    println!("                         Example: 3 [enter] 2 [enter] pow [enter] Output: 9");
+    println!("sqrt or v            change the last number on the stack to it's square root");
+    println!("cbrt or v3           change the last number on the stack to it's cube root");
+    println!("ln                   change the last number on the stack to it's natural log");
+    println!("log                  change the last number on the stack to it's base10 log");
+    println!(
+        "sin                  change the last number on the stack to it's sine value (radians)"
+    );
+    println!("asin, sinh               the same thing, but arc and hyperbolic instead");
+    println!(
+        "cos                  change the last number on the stack to it's cosine value (radians)"
+    );
+    println!("acos, cosh               the same thing, but arc and hyperbolic instead");
+    println!(
+        "tan                  change the last number on the stack to it's tangent value (radians)"
+    );
+    println!("atan, tanh               the same thing, but arc and hyperbolic instead");
+    println!("me                   pushes the machine epsilon value onto the stack");
+    println!("pi                   pushes pi onto the stack");
+    println!("tau                  pushes tau on to the stack");
+    println!("help or ?            print this help text");
+    println!();
+    println!();
 }
