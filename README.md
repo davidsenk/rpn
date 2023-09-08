@@ -1,3 +1,19 @@
+#RPN Calc
+
+How to use:
+
+Requires rust to be installed.
+
+Clone the repo:
+
+    git clone git@github.com:davidsenk/rpn.git
+
+Build and run:
+
+    # cd rpn
+
+    # cargo run
+
 ```
 This is an RPN (Reverse Polish Notation) calculator program. This works by pushing numbers to a stack, and then completing operations on the pushed numbers in the order that they were added to the stack.
 
