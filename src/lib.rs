@@ -62,6 +62,7 @@ enum Words {
     Over,
     ClearStack,
     Emit,
+    Sum,
     DefineStart,
     DefineEnd,
     Definition(Definition),
@@ -301,6 +302,16 @@ impl RPN {
         Ok(())
     }
 
+    fn sum(&mut self) -> Result {
+        let mut accumulator = self.pop()?;
+
+        while let Ok(x) = self.pop() {
+            accumulator += x;
+        }
+
+        self.push(accumulator)
+    }
+
     fn define(&mut self, name: &str, definition: Definition) {
         let name = name.to_lowercase();
         self.custom.insert(name, definition);
@@ -348,6 +359,7 @@ impl RPN {
             Words::Atan => self.atan(),
             Words::Tanh => self.tanh(),
             Words::Emit => self.emit(),
+            Words::Sum => self.sum(),
             Words::Epsilon => self.push(f64::EPSILON),
             Words::Euler => self.push(std::f64::consts::E),
             Words::Pi => self.push(std::f64::consts::PI),
@@ -411,6 +423,7 @@ impl RPN {
             "tau" => Ok(Words::Tau),
             "help" | "?" => Ok(Words::Help),
             "emit" | "." => Ok(Words::Emit),
+            "sum" => Ok(Words::Sum),
             "clear" | "c" => Ok(Words::ClearStack),
             "quit" | "q" => Ok(Words::Quit),
             unk => {
@@ -537,22 +550,24 @@ impl RPN {
 
         emit or .            print the last number pushed to the stack, removing it from the stack
 
+        sum                  sum the entire stack, pushing the result back onto the stack
 
-        Additionally, this implements a subset of FORTH for a basic level of programability.
 
-        The ':' character is used to begin a definition, and a definition is ended with ';'
+            Additionally, this implements a subset of FORTH for a basic level of programability.
 
-        Example: : name 1 2 3 + + ;
+            The ':' character is used to begin a definition, and a definition is ended with ';'
 
-        This creates a definition of 'name' that can then be called after it's definition.
+            Example: : name 1 2 3 + + ;
 
-        The definition pushes 1, 2, 3, onto the stack, and then adds 3 + 2, and then 5 + 1.
+            This creates a definition of 'name' that can then be called after it's definition.
 
-        Definitions can be used inside other definitions:
+            The definition pushes 1, 2, 3, onto the stack, and then adds 3 + 2, and then 5 + 1.
 
-        Example: : name2 name name name ;
+            Definitions can be used inside other definitions:
 
-        Creates a definition 'name2' that executes the 'name' definition 3 times.
+            Example: : name2 name name name ;
+
+            Creates a definition 'name2' that executes the 'name' definition 3 times.
 
 
 
