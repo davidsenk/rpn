@@ -7,3 +7,4 @@ edition = "2021"
 
 [dependencies]
 indoc = "2.0.4"
+simple-repl = "0.1.4"

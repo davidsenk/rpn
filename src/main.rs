@@ -1,25 +1,15 @@
 use rpn::RPN;
-use std::io;
-use std::io::Write;
+
+use simple_repl::*;
 
 fn main() {
     println!("RPN Calculator (with FORTH)");
 
     let mut rpn = RPN::new();
-    loop {
-        let mut input = String::new();
-
-        print!("> ");
-
-        io::stdout()
-            .flush()
-            .expect("flush to stdout should not fail");
-
-        io::stdin()
-            .read_line(&mut input)
-            .expect("failed to read line");
-
-        match rpn.eval(&input) {
+    //we do not want to exit if rpn.eval returns an error, we just want to print it for the user
+    //no need to use anything other than () for passthrough and error types
+    let mut eval = |input: &str|-> Result<EvalResult<()>, ()> {
+        match rpn.eval(input) {
             Err(e) => println!("Failed: {e:?}"),
             Ok(_) => {
                 println!("Current Stack: ");
@@ -28,5 +18,12 @@ fn main() {
                 }
             }
         }
-    }
+        //no need to have simple-repl do anything but loop forever with this application
+        Ok(EvalResult::Continue)
+    };
+
+    //simple-repl handles the loop for us
+    let _ = repl(&mut eval);
 }
+
+
